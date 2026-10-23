@@ -75,7 +75,7 @@ def test_buttons_and_commands_call_project(gateway, text):
     assert b'"command":"/status"' in calls[0].content
     method = bot.session.make_request.call_args.args[1]
     assert method.text == "Ready"
-    assert method.reply_markup.keyboard[0][0].text == "Status"
+    assert method.reply_markup.remove_keyboard is True
 
 
 def test_unauthorized_user_cannot_query(gateway):

@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager, suppress
 import httpx
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
-from aiogram.types import BotCommand, KeyboardButton, Message, ReplyKeyboardMarkup
+from aiogram.types import BotCommand, Message, ReplyKeyboardRemove
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
@@ -52,8 +52,7 @@ def create_app(settings: Settings, *, polling: bool = True, bots=None, client=No
         project = settings.projects[config.project_id]
         route = next((r for r in project.routes if text in
                       [s.lower() for s in [r.command, *r.aliases, *([r.button] if r.button else [])]]), None)
-        rows = [[KeyboardButton(text=r.button)] for r in project.routes if r.button]
-        keyboard = ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True, is_persistent=True) if rows else None
+        keyboard = ReplyKeyboardRemove()
         if route is None:
             await message.answer("請使用選單或已設定的指令。", reply_markup=keyboard)
             return
