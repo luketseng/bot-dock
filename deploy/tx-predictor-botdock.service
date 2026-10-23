@@ -1,0 +1,15 @@
+[Unit]
+Description=TX_Predictor query API for BotDock
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/zane/git/TX_Predictor
+EnvironmentFile=/home/zane/git/TX_Predictor/.botdock-project.env
+ExecStart=/home/zane/git/bot-dock/.venv/bin/python -m uvicorn botdock_project_api:app --host 127.0.0.1 --port 8091
+Restart=on-failure
+RestartSec=5
+UMask=0077
+
+[Install]
+WantedBy=default.target

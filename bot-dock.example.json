@@ -1,0 +1,95 @@
+{
+  "projects": {
+    "tx-predictor": {
+      "api_key_env": "TX_BOTDOCK_API_KEY",
+      "callback_url": "http://127.0.0.1:8091/botdock/query",
+      "callback_key_env": "TX_CALLBACK_KEY",
+      "routes": [
+        {
+          "command": "/status",
+          "button": "🚦 當前狀態",
+          "aliases": []
+        },
+        {
+          "command": "/forecast",
+          "button": "🤖 AI 預測",
+          "aliases": [
+            "🤖 ai預測"
+          ]
+        },
+        {
+          "command": "/today",
+          "button": "📊 今日日報",
+          "aliases": []
+        },
+        {
+          "command": "/chip",
+          "button": "📈 籌碼行情",
+          "aliases": [
+            "/market"
+          ]
+        },
+        {
+          "command": "/trades",
+          "button": "📜 歷史交易",
+          "aliases": [
+            "/trade"
+          ]
+        },
+        {
+          "command": "/strategy",
+          "button": "📐 策略邏輯",
+          "aliases": [
+            "/rule",
+            "/rules",
+            "/logic"
+          ]
+        },
+        {
+          "command": "/log",
+          "button": "📋 執行日誌",
+          "aliases": []
+        },
+        {
+          "command": "/help",
+          "button": "❓ 指令說明",
+          "aliases": [
+            "/start"
+          ]
+        }
+      ]
+    },
+    "no-ip-renew": {
+      "api_key_env": "NOIP_BOTDOCK_API_KEY"
+    }
+  },
+  "bots": {
+    "tx": {
+      "token_env": "TX_TELEGRAM_BOT_TOKEN",
+      "project_id": "tx-predictor",
+      "destinations": {
+        "owner": 123456789
+      },
+      "allowed_chat_ids": [
+        123456789
+      ],
+      "allowed_user_ids": [
+        123456789
+      ]
+    },
+    "no-ip": {
+      "token_env": "NOIP_TELEGRAM_BOT_TOKEN",
+      "project_id": "no-ip-renew",
+      "receive_updates": false,
+      "destinations": {
+        "owner": 123456789
+      },
+      "allowed_chat_ids": [
+        123456789
+      ],
+      "allowed_user_ids": [
+        123456789
+      ]
+    }
+  }
+}

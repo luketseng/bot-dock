@@ -1,0 +1,15 @@
+[Unit]
+Description=BotDock multi-bot Telegram gateway
+After=network-online.target tx-predictor-botdock.service
+Wants=network-online.target tx-predictor-botdock.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/zane/git/bot-dock
+ExecStart=/home/zane/git/bot-dock/.venv/bin/python -m bot_dock --config /home/zane/git/bot-dock/bot-dock.json --env-file /home/zane/git/bot-dock/.env
+Restart=on-failure
+RestartSec=5
+UMask=0077
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=Verify No-IP notification client through BotDock
+After=botdock.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/zane/git/no_ip_renew
+EnvironmentFile=/home/zane/git/no_ip_renew/.env
+ExecStartPre=/home/zane/git/bot-dock/.venv/bin/python -m unittest discover -s /home/zane/git/no_ip_renew/tests -v
+ExecStart=/home/zane/git/bot-dock/.venv/bin/python /home/zane/git/no_ip_renew/notify_botdock.py "BotDock migration verification: No-IP renewal notifications connected."
+TimeoutStartSec=60
+UMask=0077

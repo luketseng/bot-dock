@@ -1,0 +1,11 @@
+[Unit]
+Description=Verify deployed BotDock and TX_Predictor integration
+After=tx-predictor-botdock.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/home/zane/git/bot-dock/.venv/bin/python -m pytest /home/zane/git/bot-dock/tests /home/zane/git/TX_Predictor/tests/test_botdock_client.py /home/zane/git/TX_Predictor/tests/test_botdock_adapter.py /home/zane/git/TX_Predictor/tests/test_project_queries.py -q
+WorkingDirectory=/home/zane/git/TX_Predictor
+ExecStart=/home/zane/git/bot-dock/.venv/bin/python /home/zane/git/TX_Predictor/tests/verify_botdock_live.py
+TimeoutStartSec=120
+UMask=0077
