@@ -73,6 +73,8 @@ curl --fail-with-body http://127.0.0.1:8090/v1/messages \
 
 **只發通知：**專案設定 `api_key_env`，對應 bot 設為 `receive_updates: false`，不需 callback 或查詢 service。No-IP 採用此模式。
 
+**指令選單：**每個 route 可設定 `description`（1–256 字元）。BotDock 啟動時會以專案 routes 覆寫接收互動訊息之 bot 的 Telegram 預設指令選單，不列出 aliases；未填說明時使用指令本身。空 routes 會清除預設選單。修改 JSON 後重啟 BotDock 即可同步，TX 不需修改或重啟。其他地方設定的語言或聊天室專用選單不會被覆寫。Telegram 同步失敗時啟動會失敗。
+
 ## Service 除錯與測試
 
 ```bash

@@ -6,7 +6,8 @@ from pydantic import BaseModel, Field, model_validator
 
 
 class Route(BaseModel):
-    command: str
+    command: str = Field(pattern=r"^/[a-z0-9_]{1,32}$")
+    description: str | None = Field(default=None, min_length=1, max_length=256)
     aliases: list[str] = Field(default_factory=list)
     button: str | None = None
 
@@ -19,6 +20,8 @@ class Project(BaseModel):
 
     @model_validator(mode="after")
     def validate_routes(self):
+        if len(self.routes) > 100:
+            raise ValueError("Telegram supports at most 100 commands per project")
         if self.routes and (not self.callback_url or not self.callback_key_env):
             raise ValueError("Interactive routes require callback_url and callback_key_env")
         names = [name.lower() for route in self.routes

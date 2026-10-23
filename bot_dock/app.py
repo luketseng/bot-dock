@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager, suppress
 import httpx
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
-from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup
+from aiogram.types import BotCommand, KeyboardButton, Message, ReplyKeyboardMarkup
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
@@ -88,6 +88,14 @@ def create_app(settings: Settings, *, polling: bool = True, bots=None, client=No
                     webhook = await bot.get_webhook_info()
                     if webhook.url:
                         raise RuntimeError("Existing webhook must be removed before enabling polling")
+                for name, config in settings.bots.items():
+                    if config.receive_updates:
+                        routes = settings.projects[config.project_id].routes
+                        await senders[name].set_my_commands([
+                            BotCommand(command=route.command[1:],
+                                       description=route.description or route.command)
+                            for route in routes
+                        ])
                 if polling_bots:
                     task = asyncio.create_task(dispatcher.start_polling(
                         *polling_bots, handle_signals=False, close_bot_session=False,

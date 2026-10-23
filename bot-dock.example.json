@@ -8,33 +8,38 @@
         {
           "command": "/status",
           "button": "🚦 當前狀態",
-          "aliases": []
+          "aliases": [],
+          "description": "查詢當前狀態"
         },
         {
           "command": "/forecast",
           "button": "🤖 AI 預測",
           "aliases": [
             "🤖 ai預測"
-          ]
+          ],
+          "description": "查詢 AI 預測"
         },
         {
           "command": "/today",
           "button": "📊 今日日報",
-          "aliases": []
+          "aliases": [],
+          "description": "查詢今日日報"
         },
         {
           "command": "/chip",
           "button": "📈 籌碼行情",
           "aliases": [
             "/market"
-          ]
+          ],
+          "description": "查詢籌碼行情"
         },
         {
           "command": "/trades",
           "button": "📜 歷史交易",
           "aliases": [
             "/trade"
-          ]
+          ],
+          "description": "查詢歷史交易"
         },
         {
           "command": "/strategy",
@@ -43,19 +48,22 @@
             "/rule",
             "/rules",
             "/logic"
-          ]
+          ],
+          "description": "查看策略邏輯"
         },
         {
           "command": "/log",
           "button": "📋 執行日誌",
-          "aliases": []
+          "aliases": [],
+          "description": "查看執行日誌"
         },
         {
           "command": "/help",
           "button": "❓ 指令說明",
           "aliases": [
             "/start"
-          ]
+          ],
+          "description": "查看指令說明"
         }
       ]
     },

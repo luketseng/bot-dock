@@ -71,6 +71,8 @@ Success returns `{"ok":true,"message_id":123}`. Text is limited to 4096 characte
 
 **Interactive queries:** configure `callback_url`, `callback_key_env` and `routes`. BotDock sends an authenticated POST with `command`, `bot_id`, `chat_id` and `user_id`; the project returns `{"text":"Result","parse_mode":"HTML"}`. The project owns data access and HTML escaping. Chat allowlists apply; configured user allowlists must also match.
 
+**Command menu:** each route accepts an optional `description` (1–256 characters). At startup, BotDock replaces each receiving bot's default Telegram command menu with its project routes; aliases are excluded. Without a description, the command itself is used. An empty route list clears the default menu. Restart BotDock after editing JSON to sync changes; TX needs no changes or restart. Existing language-specific or chat-specific menus configured elsewhere are not replaced. Telegram sync failures fail startup.
+
 **Notification-only projects:** set `api_key_env` on the project and `receive_updates: false` on its bot. No callback or query service is required. No-IP uses this mode.
 
 ## Service debugging and testing
