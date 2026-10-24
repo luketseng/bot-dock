@@ -6,8 +6,6 @@ import os
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-from fastapi import FastAPI, Header, HTTPException
-from pydantic import BaseModel
 
 
 def default_config_path():
@@ -57,14 +55,17 @@ def main():
     print(json.dumps(result))
 
 
-class Query(BaseModel):
-    command: str
-    bot_id: str
-    chat_id: int
-    user_id: int | None = None
-
-
 def create_app():
+    # Import callback dependencies only when starting the interactive service.
+    from fastapi import FastAPI, Header, HTTPException
+    from pydantic import BaseModel
+
+    class Query(BaseModel):
+        command: str
+        bot_id: str
+        chat_id: int
+        user_id: int | None = None
+
     config_path = default_config_path()
     config = json.loads(Path(config_path).read_text(encoding="utf-8"))
     key_name = config["callback_key_env"]

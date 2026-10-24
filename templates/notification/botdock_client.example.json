@@ -1,8 +1,0 @@
-{
-  "base_url": "http://127.0.0.1:8090",
-  "project_id": "my-project",
-  "bot_id": "my-bot",
-  "destination_id": "owner",
-  "api_key_env": "MYPROJECT_BOTDOCK_API_KEY",
-  "timeout_seconds": 20
-}

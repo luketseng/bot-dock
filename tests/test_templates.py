@@ -21,35 +21,28 @@ def load_template(name):
     return module
 
 
-@pytest.mark.parametrize("mode", ["notification", "interactive", "combined"])
+@pytest.mark.parametrize("mode", ["notification", "interactive"])
 def test_template_config_matches_gateway(mode):
-    directory = TEMPLATES / mode
-    settings = Settings.load(str(directory / "bot-dock.fragment.json"))
+    settings = Settings.load(str(TEMPLATES / f"bot-dock.{mode}.fragment.json"))
     bot = settings.bots["my-bot"]
     project = settings.projects[bot.project_id]
-    assert bot.receive_updates == (mode != "notification")
-    if mode != "interactive":
-        config = json.loads((directory / ("botdock.example.json" if mode == "combined" else "botdock_client.example.json")).read_text())
-        assert config["project_id"] == bot.project_id
-        assert config["bot_id"] == "my-bot"
-        assert config["destination_id"] in bot.destinations
-        assert config["api_key_env"] == project.api_key_env
-    if mode != "notification":
-        config = json.loads((directory / ("botdock.example.json" if mode == "combined" else "botdock_callback.example.json")).read_text())
+    config = json.loads((TEMPLATES / "botdock.example.json").read_text())
+    assert bot.receive_updates == (mode == "interactive")
+    assert config["project_id"] == bot.project_id
+    assert config["bot_id"] == "my-bot"
+    assert config["destination_id"] in bot.destinations
+    assert config["api_key_env"] == project.api_key_env
+    if mode == "interactive":
         assert config["callback_key_env"] == project.callback_key_env
         assert config["allowed_chat_ids"] == bot.allowed_chat_ids
         assert config["allowed_user_ids"] == bot.allowed_user_ids
 
 
-@pytest.mark.parametrize("combined", [False, True])
-def test_notification_template_sends_gateway_payload(monkeypatch, combined):
-    module = load_template("combined/botdock_app" if combined else "notification/botdock_client")
+def test_notification_template_sends_gateway_payload(monkeypatch):
+    module = load_template("botdock_app")
     monkeypatch.setenv("MYPROJECT_BOTDOCK_API_KEY", "test-key")
-    if combined:
-        monkeypatch.setenv("BOTDOCK_CONFIG", str(TEMPLATES / "combined/botdock.example.json"))
-        client = module.BotDockClient()
-    else:
-        client = module.BotDockClient(TEMPLATES / "notification/botdock_client.example.json")
+    monkeypatch.setenv("BOTDOCK_CONFIG", str(TEMPLATES / "botdock.example.json"))
+    client = module.BotDockClient()
     response = MagicMock()
     response.__enter__.return_value.read.return_value = b'{"ok": true, "message_id": 7}'
     with patch.object(module, "urlopen", return_value=response) as send:
@@ -70,13 +63,9 @@ def test_notification_template_sends_gateway_payload(monkeypatch, combined):
         client.send("完成")
 
 
-@pytest.mark.parametrize("combined", [False, True])
-def test_callback_template_auth_permissions_and_routes(monkeypatch, combined):
-    module = load_template("combined/botdock_app" if combined else "interactive/callback_app")
-    monkeypatch.setenv(
-        "BOTDOCK_CONFIG" if combined else "BOTDOCK_CALLBACK_CONFIG",
-        str(TEMPLATES / ("combined/botdock.example.json" if combined else "interactive/botdock_callback.example.json")),
-    )
+def test_callback_template_auth_permissions_and_routes(monkeypatch):
+    module = load_template("botdock_app")
+    monkeypatch.setenv("BOTDOCK_CONFIG", str(TEMPLATES / "botdock.example.json"))
     monkeypatch.setenv("MYPROJECT_CALLBACK_KEY", "callback-key")
     app = module.create_app()
 
@@ -87,7 +76,7 @@ def test_callback_template_auth_permissions_and_routes(monkeypatch, combined):
             assert (await client.post("/botdock/query", json=body)).status_code == 401
             for change in [{"bot_id": "other"}, {"chat_id": 1}, {"user_id": 1}, {"user_id": None}]:
                 assert (await client.post("/botdock/query", json={**body, **change}, headers=headers)).status_code == 403
-            settings = Settings.load(str(TEMPLATES / "interactive/bot-dock.fragment.json"))
+            settings = Settings.load(str(TEMPLATES / "bot-dock.interactive.fragment.json"))
             for route in settings.projects["my-project"].routes:
                 response = await client.post("/botdock/query", json={**body, "command": route.command}, headers=headers)
                 assert response.status_code == 200
@@ -95,3 +84,12 @@ def test_callback_template_auth_permissions_and_routes(monkeypatch, combined):
             assert (await client.post("/botdock/query", json={**body, "command": "/unknown"}, headers=headers)).status_code == 400
 
     asyncio.run(run())
+
+
+def test_notification_import_without_callback_dependencies():
+    import subprocess
+    import sys
+
+    # A fresh isolated interpreter excludes installed FastAPI and Pydantic.
+    script = "import runpy; runpy.run_path(%r, run_name='template_test')" % str(TEMPLATES / "botdock_app.py")
+    subprocess.run([sys.executable, "-I", "-S", "-c", script], check=True, capture_output=True)

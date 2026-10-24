@@ -100,14 +100,15 @@ journalctl --user -u botdock-verify.service -u no-ip-botdock-verify.service -n 5
 
 ## 其他專案快速接入
 
-請參考 [接入模板](templates/README.md)，提供純通知、純互動查詢及通知＋互動三款 JSON／Python 範例與兩端設定步驟。
+想讓代理引導安裝，請使用 [INSTALL_SOP](INSTALL_SOP.md)：先選「通知／互動／兩者」，再完成接入與驗證，最後更新目標專案 README。
+
+請參考 [接入模板](templates/README.md)，以共用的一支 Python 與一份 JSON 支援純通知、純互動查詢及通知＋互動，並提供詳細安裝步驟與可複製的 setup 提示詞。
 
 | 放置端 | 檔案 | 用途 |
 |---|---|---|
-| 目標專案 | `botdock_client.py`、`botdock_client.json` | 主動通知 |
-| 目標專案 | `callback_app.py`、`botdock_callback.json` | 互動查詢 |
+| 目標專案 | `botdock_app.py`、`botdock.json` | 主動通知及／或互動查詢 |
 | 目標專案 | `.botdock.env` | 專案 API key；加入該專案 `.gitignore`，限制權限為 `0600` |
-| BotDock | `bot-dock.json` | 合併模板的 `bot-dock.fragment.json`，保留其他專案 |
+| BotDock | `bot-dock.json` | 合併 `bot-dock.notification.fragment.json` 或 `bot-dock.interactive.fragment.json`，保留其他專案 |
 | BotDock | `.env` | 合併 `.env.botdock.example` 的變數與真實 key |
 
-JSON 只保存環境變數名稱，真實 key 放 env 檔。依使用的款式複製對應 Python 與 JSON；純通知不需 callback。
+JSON 只保存環境變數名稱，真實 key 放 env 檔。所有情境複製相同 Python 與 JSON；純通知只需標準函式庫，啟動 callback 才需 FastAPI、Uvicorn。

@@ -50,17 +50,18 @@ Each receiving bot token must have one polling owner, with no existing webhook. 
 
 ## Data exchange
 
+For guided installation, follow [INSTALL_SOP](INSTALL_SOP.md). The agent asks whether you need notifications, interactive queries, or both, completes setup and verification, then documents actual usage in the target project README.
+
 For copyable Python clients and JSON configuration, see the [integration templates](templates/README.md): notification-only, interactive-only, and combined projects.
 
 | Location | Files | Purpose |
 |---|---|---|
-| Target project | `botdock_client.py`, `botdock_client.json` | Send notifications |
-| Target project | `callback_app.py`, `botdock_callback.json` | Handle interactive queries |
+| Target project | `botdock_app.py`, `botdock.json` | Send notifications and/or handle interactive queries |
 | Target project | `.botdock.env` | Project API keys; exclude from Git and restrict to `0600` |
-| BotDock | `bot-dock.json` | Merge template `bot-dock.fragment.json` entries, keeping existing projects |
+| BotDock | `bot-dock.json` | Merge `bot-dock.notification.fragment.json` or `bot-dock.interactive.fragment.json` entries, keeping existing projects |
 | BotDock | `.env` | Merge variables from `.env.botdock.example` and set real keys |
 
-JSON stores environment variable names; env files store actual keys. Copy only the Python and JSON files needed for your mode; notification-only projects need no callback.
+JSON stores environment variable names; env files store actual keys. All modes use the same project-side Python and JSON template. Notification-only use requires only the Python standard library; callback dependencies are loaded only when starting the interactive service. The integration guide includes installation steps and copyable setup prompts.
 
 ```text
 TX:    run_daily.py -> notify_telegram.py ----> BotDock:8090 -> TX bot
