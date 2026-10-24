@@ -97,3 +97,17 @@ journalctl --user -u botdock-verify.service -u no-ip-botdock-verify.service -n 5
 ```
 
 這些手動驗證會執行測試並**發送真實 Telegram 測試通知**；TX 驗證也會檢查查詢 API，不會執行 No-IP 續約。成功的 oneshot service 會回到 `inactive`，且 `ExecMainStatus=0`。
+
+## 其他專案快速接入
+
+請參考 [接入模板](templates/README.md)，提供純通知、純互動查詢及通知＋互動三款 JSON／Python 範例與兩端設定步驟。
+
+| 放置端 | 檔案 | 用途 |
+|---|---|---|
+| 目標專案 | `botdock_client.py`、`botdock_client.json` | 主動通知 |
+| 目標專案 | `callback_app.py`、`botdock_callback.json` | 互動查詢 |
+| 目標專案 | `.botdock.env` | 專案 API key；加入該專案 `.gitignore`，限制權限為 `0600` |
+| BotDock | `bot-dock.json` | 合併模板的 `bot-dock.fragment.json`，保留其他專案 |
+| BotDock | `.env` | 合併 `.env.botdock.example` 的變數與真實 key |
+
+JSON 只保存環境變數名稱，真實 key 放 env 檔。依使用的款式複製對應 Python 與 JSON；純通知不需 callback。

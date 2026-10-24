@@ -1,0 +1,23 @@
+{
+  "projects": {
+    "my-project": {
+      "api_key_env": "MYPROJECT_BOTDOCK_API_KEY"
+    }
+  },
+  "bots": {
+    "my-bot": {
+      "token_env": "MYPROJECT_TELEGRAM_BOT_TOKEN",
+      "project_id": "my-project",
+      "receive_updates": false,
+      "destinations": {
+        "owner": 123456789
+      },
+      "allowed_chat_ids": [
+        123456789
+      ],
+      "allowed_user_ids": [
+        123456789
+      ]
+    }
+  }
+}
