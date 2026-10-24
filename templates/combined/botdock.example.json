@@ -4,5 +4,12 @@
   "bot_id": "my-bot",
   "destination_id": "owner",
   "api_key_env": "MYPROJECT_BOTDOCK_API_KEY",
-  "timeout_seconds": 20
+  "timeout_seconds": 20,
+  "callback_key_env": "MYPROJECT_CALLBACK_KEY",
+  "allowed_chat_ids": [
+    123456789
+  ],
+  "allowed_user_ids": [
+    123456789
+  ]
 }

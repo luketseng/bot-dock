@@ -1,12 +1,12 @@
 # 專案接入模板
 
-這些檔案供其他專案複製使用，不需要安裝 BotDock Python 套件。
+這些檔案供其他專案複製使用，不需要安裝 BotDock Python 套件。各情境目錄包含對應的 Python、JSON 與環境變數範本。
 
 | 模板 | 用途 | 專案端 Python |
 |---|---|---|
 | `notification/` | 排程、CI、腳本主動發送通知 | `botdock_client.py` |
 | `interactive/` | 使用者輸入 Telegram 指令，專案查詢後回覆 | `callback_app.py` |
-| `combined/` | 主動通知＋互動查詢 | 以上兩個檔案 |
+| `combined/` | 主動通知＋互動查詢 | `botdock_app.py` |
 
 互動查詢的回覆由 callback 回傳，再由 BotDock 發送；不需要再呼叫通知 client，否則會重複回覆。目前介面只傳指令名稱，不傳指令參數。
 
@@ -14,8 +14,9 @@
 
 | 放置端 | 檔案 | 用途 |
 |---|---|---|
-| 目標專案 | `botdock_client.py`、`botdock_client.json` | 純通知或通知＋互動：主動發送訊息 |
-| 目標專案 | `callback_app.py`、`botdock_callback.json` | 純互動或通知＋互動：處理指令查詢 |
+| 目標專案 | `botdock_client.py`、`botdock_client.json` | 純通知：主動發送訊息 |
+| 目標專案 | `callback_app.py`、`botdock_callback.json` | 純互動：處理指令查詢 |
+| 目標專案 | `botdock_app.py`、`botdock.json` | 通知＋互動：集中維護通知與查詢 |
 | 目標專案 | `.botdock.env` | 專案 API key；加入該專案 `.gitignore`，限制權限為 `0600` |
 | BotDock | `bot-dock.json` | 合併所選模板的 `bot-dock.fragment.json`，保留既有專案 |
 | BotDock | `.env` | 合併 `.env.botdock.example` 的變數，包含 Telegram token 與對應 key |
@@ -29,7 +30,7 @@ JSON 只保存環境變數名稱，真實 key 放 env 檔。`*.example.json` 複
 純通知：
 
 ```bash
-cp templates/botdock_client.py /path/to/project/
+cp templates/notification/botdock_client.py /path/to/project/
 cp templates/notification/botdock_client.example.json /path/to/project/botdock_client.json
 cp templates/notification/.env.example /path/to/project/.botdock.env
 ```
@@ -37,7 +38,7 @@ cp templates/notification/.env.example /path/to/project/.botdock.env
 純互動：
 
 ```bash
-cp templates/callback_app.py /path/to/project/
+cp templates/interactive/callback_app.py /path/to/project/
 cp templates/interactive/botdock_callback.example.json /path/to/project/botdock_callback.json
 cp templates/interactive/.env.example /path/to/project/.botdock.env
 ```
@@ -45,9 +46,8 @@ cp templates/interactive/.env.example /path/to/project/.botdock.env
 通知＋互動：
 
 ```bash
-cp templates/botdock_client.py templates/callback_app.py /path/to/project/
-cp templates/combined/botdock_client.example.json /path/to/project/botdock_client.json
-cp templates/combined/botdock_callback.example.json /path/to/project/botdock_callback.json
+cp templates/combined/botdock_app.py /path/to/project/
+cp templates/combined/botdock.example.json /path/to/project/botdock.json
 cp templates/combined/.env.example /path/to/project/.botdock.env
 ```
 
@@ -114,4 +114,27 @@ callback 預設讀取 Python 檔案旁的 `botdock_callback.json`；可透過 `B
 
 ## 5. 通知＋互動
 
-依序完成通知與互動步驟，使用同一組 project／bot ID。callback 回傳即時查詢結果，排程或背景工作透過 `BotDockClient.send()` 發送主動通知。
+專案端只需維護 `botdock_app.py` 與 `botdock.json`；通知與 callback 共用 project／bot ID、設定路徑，兩種金鑰仍分開保存在 `.botdock.env`。BotDock 端仍需依步驟 2 合併設定。
+
+在目標專案虛擬環境安裝步驟 4 的 FastAPI 與 Uvicorn，載入環境變數後執行：
+
+```bash
+set -a
+. ./.botdock.env
+set +a
+python3 botdock_app.py '排程執行完成'
+python3 -m uvicorn botdock_app:create_app --factory --host 127.0.0.1 --port 8092
+```
+
+第一個 Python 命令會發送通知並退出；第二個會啟動常駐互動服務。在 `botdock_app.py` 的 `/status` handler 修改實際查詢，新增指令時同步更新 BotDock routes。互動回覆由 callback 回傳，BotDock 負責發送，勿再呼叫通知 client 重複回覆。
+
+排程或背景工作可引用同一支程式：
+
+```python
+from botdock_app import BotDockClient
+
+client = BotDockClient()
+client.send("排程執行完成")
+```
+
+預設讀取 Python 檔案旁的 `botdock.json`；設定 `BOTDOCK_CONFIG` 可同時改變通知與 callback 的設定路徑，通知 CLI 另可使用 `--config`。通知的錯誤處理與文字限制同步驟 3，互動的回覆格式與時間限制同步驟 4。
