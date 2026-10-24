@@ -2,7 +2,7 @@
 
 所有情境共用一支 `botdock_app.py` 與一份 `botdock.json`。不需要安裝 BotDock Python 套件；純通知只使用 Python 3.10+ 標準函式庫，互動服務才需要 FastAPI、Uvicorn。
 
-要由代理引導安裝，請使用 [INSTALL_SOP](../INSTALL_SOP.md)：它會先詢問「通知／互動／兩者」，再完成接入與驗證，最後更新目標專案 README。可以直接說：
+要由代理引導安裝，請使用 [INSTALL_SOP](../INSTALL_SOP.md)：它會先確認「通知／互動／兩者」及使用既有或新增 bot，接著確認金鑰、路由與部署需求，再完成接入與驗證，最後更新目標專案 README。可以直接說：
 
 ```text
 請依 /home/zane/git/bot-dock/INSTALL_SOP.md 安裝，目標專案是 [絕對路徑]。
